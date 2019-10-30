@@ -3,14 +3,13 @@
 namespace Drupal\stripe_api\Event;
 
 use Stripe\Event as StripeEvent;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class StripeApiWebhookEvent.
  *
  * Provides the Stripe API Webhook Event.
  */
-class StripeApiWebhookEvent extends Event {
+class StripeApiWebhookEvent extends \Symfony\Component\EventDispatcher\Event {
 
   /**
    * @var string*/
