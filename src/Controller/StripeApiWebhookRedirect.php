@@ -18,7 +18,7 @@ class StripeApiWebhookRedirect extends ControllerBase {
    *   Redirect the user to home page and show the message.
    */
   public function webhookRedirect() {
-    drupal_set_message($this->t('The webhook route works properly.'));
+    $this->messenger()->addMessage($this->t('The webhook route works properly.'));
     return new RedirectResponse(Url::fromRoute('<front>')->setAbsolute()->toString());
   }
 
