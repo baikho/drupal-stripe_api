@@ -1,6 +1,0 @@
-<?php
-
-/**
- * @file
- * Contains hook and methods for the Stripe API module.
- */

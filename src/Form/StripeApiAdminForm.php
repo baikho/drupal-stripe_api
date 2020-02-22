@@ -18,7 +18,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class StripeApiAdminForm extends ConfigFormBase {
 
   /**
-   * @var \Drupal\stripe_api\StripeApiService*/
+   * Stripe API service.
+   *
+   * @var \Drupal\stripe_api\StripeApiService
+   */
   protected $stripeApi;
 
   /**
@@ -27,6 +30,7 @@ class StripeApiAdminForm extends ConfigFormBase {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
    * @param \Drupal\stripe_api\StripeApiService $stripe_api
+   *   Stripe API service.
    */
   public function __construct(ConfigFactoryInterface $config_factory, StripeApiService $stripe_api) {
     $this->stripeApi = $stripe_api;
@@ -47,7 +51,7 @@ class StripeApiAdminForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormID() {
+  public function getFormId() {
     return 'stripe_api_admin_form';
   }
 
@@ -69,9 +73,12 @@ class StripeApiAdminForm extends ConfigFormBase {
     // @see https://www.drupal.org/docs/7/api/localization-api/dynamic-or-static-links-and-html-in-translatable-strings
     $form['link'] = [
       '#markup' => $this->t('Stripe links: <a href="@stripe-dashboard" target="_blank">Dashboard</a> | <a href="@stripe-keys" target="_blank">API Keys</a> | <a href="@stripe-docs" target="_blank">Docs</a><br /><br />', [
-        '@stripe-dashboard' => Url::fromUri('https://dashboard.stripe.com', ['attributes' => ['target' => '_blank']])->toString(),
-        '@stripe-keys' => Url::fromUri('https://dashboard.stripe.com/account/apikeys', ['attributes' => ['target' => '_blank']])->toString(),
-        '@stripe-docs' => Url::fromUri('https://stripe.com/docs/api', ['attributes' => ['target' => '_blank']])->toString(),
+        '@stripe-dashboard' => Url::fromUri('https://dashboard.stripe.com', ['attributes' => ['target' => '_blank']])
+          ->toString(),
+        '@stripe-keys' => Url::fromUri('https://dashboard.stripe.com/account/apikeys', ['attributes' => ['target' => '_blank']])
+          ->toString(),
+        '@stripe-docs' => Url::fromUri('https://stripe.com/docs/api', ['attributes' => ['target' => '_blank']])
+          ->toString(),
       ]),
     ];
     $form['test_secret_key'] = [
@@ -140,7 +147,8 @@ class StripeApiAdminForm extends ConfigFormBase {
       '#default_value' => Url::fromRoute('stripe_api.webhook', [], ['absolute' => TRUE])
         ->toString(),
       '#description' => $this->t('Add this webhook path in the <a href="@stripe-dashboard">Stripe Dashboard</a>', [
-        '@stripe-dashboard' => Url::fromUri('https://dashboard.stripe.com/account/webhooks', ['attributes' => ['target' => '_blank']])->toString(),
+        '@stripe-dashboard' => Url::fromUri('https://dashboard.stripe.com/account/webhooks', ['attributes' => ['target' => '_blank']])
+          ->toString(),
       ]),
     ];
 
@@ -168,6 +176,14 @@ class StripeApiAdminForm extends ConfigFormBase {
 
   /**
    * AJAX callback to test the Stripe connection.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return array
+   *   The form structure.
    */
   public function testStripeConnection(array &$form, FormStateInterface $form_state) {
     try {
@@ -176,6 +192,7 @@ class StripeApiAdminForm extends ConfigFormBase {
     catch (\Exception $e) {
       $account = NULL;
     }
+
     if ($account && $account->email) {
       return ['#markup' => $this->t('Success! Account email: %email', ['%email' => $account->email])];
     }

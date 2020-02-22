@@ -17,11 +17,18 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class StripeApiWebhook extends ControllerBase {
 
-  // Fake ID from Stripe we can check against.
+  /**
+   * Fake ID from Stripe we can check against.
+   *
+   * @var string
+   */
   const FAKE_EVENT_ID = 'evt_00000000000000';
 
   /**
-   * @var \Drupal\stripe_api\StripeApiService*/
+   * Stripe API service.
+   *
+   * @var \Drupal\stripe_api\StripeApiService
+   */
   protected $stripeApi;
 
   /**
@@ -43,9 +50,11 @@ class StripeApiWebhook extends ControllerBase {
   /**
    * Captures the incoming webhook request.
    *
-   * @param $request Request
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The current request.
    *
-   * @return Response
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   A Response object.
    */
   public function handleIncomingWebhook(Request $request) {
     $input = $request->getContent();
@@ -61,14 +70,14 @@ class StripeApiWebhook extends ControllerBase {
       return new Response(NULL, Response::HTTP_FORBIDDEN);
     }
 
-    /** @var LoggerChannelInterface $logger */
+    /** @var \Drupal\Core\Logger\LoggerChannelInterface $logger */
     $logger = $this->getLogger('stripe_api');
     $logger->info("Stripe webhook received event:\n @event", ['@event' => (string) $event]);
 
     // Dispatch the webhook event.
     $dispatcher = \Drupal::service('event_dispatcher');
-    $e = new StripeApiWebhookEvent($event->type, $decoded_input->data, $event);
-    $dispatcher->dispatch('stripe_api.webhook', $e);
+    $webhook_event = new StripeApiWebhookEvent($event->type, $decoded_input->data, $event);
+    $dispatcher->dispatch('stripe_api.webhook', $webhook_event);
 
     return new Response('Okay', Response::HTTP_OK);
   }
@@ -84,15 +93,15 @@ class StripeApiWebhook extends ControllerBase {
    * @return bool|\Stripe\Event
    *   Returns TRUE if the webhook is valid or the Stripe Event object.
    */
-  private function isValidWebhook($mode, $data) {
-    if (!empty($data->id)) {
-
-      if ($mode === 'live' && $data->livemode == TRUE
-      || $mode === 'test' && $data->livemode == FALSE
-      || $data->id == self::FAKE_EVENT_ID) {
-
+  private function isValidWebhook(string $mode, object $event_json) {
+    if (!empty($event_json->id)) {
+      if (
+        ($mode == 'live' && $event_json->livemode == TRUE) ||
+        ($mode == 'test' && $event_json->livemode == FALSE) ||
+        $event_json->id == self::FAKE_EVENT_ID
+      ) {
         // Verify the event by fetching it from Stripe.
-        return Event::retrieve($data->id);
+        return Event::retrieve($event_json->id);
       }
     }
 

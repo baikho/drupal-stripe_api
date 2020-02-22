@@ -2,23 +2,35 @@
 
 namespace Drupal\stripe_api\Event;
 
-use Stripe\Event as StripeEvent;
+use Stripe\Event;
+use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 
 /**
  * Class StripeApiWebhookEvent.
  *
  * Provides the Stripe API Webhook Event.
  */
-class StripeApiWebhookEvent extends \Symfony\Component\EventDispatcher\Event {
+class StripeApiWebhookEvent extends SymfonyEvent {
 
   /**
-   * @var string*/
+   * Webhook event type.
+   *
+   * @var string
+   */
   public $type;
+
   /**
-   * @var array*/
+   * Webhook event data.
+   *
+   * @var array
+   */
   public $data;
+
   /**
-   * @var \Stripe\Event*/
+   * Stripe event object.
+   *
+   * @var \Stripe\Event
+   */
   public $event;
 
   /**
@@ -31,7 +43,7 @@ class StripeApiWebhookEvent extends \Symfony\Component\EventDispatcher\Event {
    * @param \Stripe\Event $event
    *   Stripe event object.
    */
-  public function __construct($type, $data, StripeEvent $event = NULL) {
+  public function __construct(string $type, array $data, Event $event = NULL) {
     $this->type = $type;
     $this->data = $data;
     $this->event = $event;

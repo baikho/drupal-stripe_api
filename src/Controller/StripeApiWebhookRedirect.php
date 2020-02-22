@@ -12,14 +12,17 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class StripeApiWebhookRedirect extends ControllerBase {
 
   /**
-   * Webhookredirect.
+   * Redirects the user to home page and show the message.
    *
-   * @return string
-   *   Redirect the user to home page and show the message.
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   A redirect response object.
    */
   public function webhookRedirect() {
-    $this->messenger()->addMessage($this->t('The webhook route works properly.'));
-    return new RedirectResponse(Url::fromRoute('<front>')->setAbsolute()->toString());
+    $this->messenger()
+      ->addMessage($this->t('The webhook route works properly.'));
+    return new RedirectResponse(Url::fromRoute('<front>')
+      ->setAbsolute()
+      ->toString());
   }
 
 }

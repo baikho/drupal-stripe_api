@@ -24,6 +24,8 @@ class StripeApiService {
   protected $configFactory;
 
   /**
+   * The entity type manager.
+   *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
@@ -35,7 +37,11 @@ class StripeApiService {
    */
   protected $logger;
 
-  /** @var \Drupal\key\KeyRepositoryInterface */
+  /**
+   * The Key Repository.
+   *
+   * @var \Drupal\key\KeyRepositoryInterface
+   */
   protected $key;
 
   /**
@@ -51,7 +57,10 @@ class StripeApiService {
   }
 
   /**
+   * Gets Stripe API mode.
    *
+   * @return string
+   *   Stripe API mode.
    */
   public function getMode() {
     $mode = $this->config->get('mode');
@@ -64,7 +73,10 @@ class StripeApiService {
   }
 
   /**
+   * Gets Stripe API secret key.
    *
+   * @return string
+   *   Stripe API secret key.
    */
   public function getApiKey() {
     $config_key = $this->getMode() . '_secret_key';
@@ -81,7 +93,10 @@ class StripeApiService {
   }
 
   /**
+   * Gets Stripe API public key.
    *
+   * @return string
+   *   Stripe API public key.
    */
   public function getPubKey() {
     $config_key = $this->getMode() . '_public_key';
