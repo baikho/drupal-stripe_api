@@ -1,5 +1,6 @@
 <?php
 /**
+ * @file
  * Stripe API hook examples.
  */
 
@@ -8,10 +9,8 @@
  *
  * @param string $type
  *   Webhook type, such as customer.created, charge.captured, etc.
- *
  * @param object $data
  *   Incoming data object.
- *
  * @param Stripe\Event $event
  *   The verified Stripe Event that is being sent.
  *   Only available in live mode with real events (not test events).
@@ -38,7 +37,6 @@ function hook_stripe_api_webhook($type, $data, Stripe\Event $event = NULL) {
  *
  * @param object $data
  *   Incoming data object.
- *
  * @param Stripe\Event $event
  *   The verified Stripe Event that is being sent.
  *   Only available in live mode with real events (not test events).
