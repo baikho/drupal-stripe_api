@@ -28,9 +28,9 @@ class StripeApiWebhookSubscriber implements EventSubscriberInterface {
    */
   public function onIncomingWebhook(StripeApiWebhookEvent $event) {
     $config = \Drupal::config('stripe_api.settings');
-    if ($config->get('log_webhooks') ?: TRUE) {
+    if ($config->get('log_webhooks')) {
       \Drupal::logger('stripe_api')
-        ->notice('Processed webhook: @name<br /><br />Data: @data', [
+        ->info('Processed webhook: @name<br /><br />Data: @data', [
           '@name' => $event->type,
           '@data' => Json::encode($event->data),
         ]);
