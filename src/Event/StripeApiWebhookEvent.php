@@ -38,12 +38,12 @@ class StripeApiWebhookEvent extends SymfonyEvent {
    *
    * @param string $type
    *   Webhook event type.
-   * @param array $data
+   * @param object $data
    *   Webhook event data.
    * @param \Stripe\Event $event
    *   Stripe event object.
    */
-  public function __construct(string $type, array $data, Event $event = NULL) {
+  public function __construct(string $type, $data, Event $event = NULL) {
     $this->type = $type;
     $this->data = $data;
     $this->event = $event;
