@@ -59,16 +59,17 @@ class StripeApiWebhook extends ControllerBase {
   public function handleIncomingWebhook(Request $request) {
     $input = $request->getContent();
     $decoded_input = json_decode($input);
-    $config = $this->config('stripe_api.settings');
-    $mode = $config->get('mode') ?: 'test';
 
-    if (!$event = $this->isValidWebhook($mode, $decoded_input)) {
+    if (!$event = $this->isValidWebhook($decoded_input)) {
       $this->getLogger('stripe_api')
         ->error('Invalid webhook event: @data', [
           '@data' => $input,
         ]);
       return new Response(NULL, Response::HTTP_FORBIDDEN);
     }
+
+    $config = $this->config('stripe_api.settings');
+
     if ($config->get('log_webhooks')) {
        /** @var \Drupal\Core\Logger\LoggerChannelInterface $logger */
        $logger = $this->getLogger('stripe_api');
@@ -86,24 +87,22 @@ class StripeApiWebhook extends ControllerBase {
   /**
    * Determines if a webhook is valid.
    *
-   * @param string $mode
-   *   Stripe API mode. Either 'live' or 'test'.
    * @param object $event_json
    *   Stripe event object parsed from JSON.
    *
    * @return bool|\Stripe\Event
-   *   Returns TRUE if the webhook is valid or the Stripe Event object.
+   *   Returns a Stripe Event object or false if validation fails.
    */
-  private function isValidWebhook(string $mode, object $event_json) {
+  private function isValidWebhook(object $event_json) {
     if (!empty($event_json->id)) {
-      if (
-        ($mode == 'live' && $event_json->livemode == TRUE) ||
-        ($mode == 'test' && $event_json->livemode == FALSE) ||
-        $event_json->id == self::FAKE_EVENT_ID
-      ) {
-        // Verify the event by fetching it from Stripe.
-        return Event::retrieve($event_json->id);
+
+      if ($this->stripeApi->getMode() === 'test' && $event_json->livemode === FALSE && $event_json->id === self::FAKE_EVENT_ID) {
+        // Don't try to verify this event, as it doesn't exist at stripe.
+        return Event::constructFrom($event_json->object);
       }
+
+      // Verify the event by fetching it from Stripe.
+      return Event::retrieve($event_json->id);
     }
 
     return FALSE;
