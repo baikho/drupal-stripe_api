@@ -2,12 +2,10 @@
 
 namespace Drupal\stripe_api;
 
-use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\key\KeyRepositoryInterface;
-use Stripe\Stripe;
 use Stripe\StripeClient;
 
 /**
@@ -52,12 +50,12 @@ class StripeApiService {
    *   Config factory.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\LoggerInterface $logger
+   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   Logger.
    * @param \Drupal\key\KeyRepositoryInterface $key
    *   The Key Repository.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger, KeyRepositoryInterface $key) {
+  public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, LoggerChannelInterface $logger, KeyRepositoryInterface $key) {
     $this->config = $config_factory->get('stripe_api.settings');
     $this->entityTypeManager = $entity_type_manager;
     $this->logger = $logger;
@@ -71,6 +69,7 @@ class StripeApiService {
    *   Optional array of config.
    *
    * @return \Stripe\StripeClient
+   *   The StripeClient.
    */
   public function getStripeClient(array $config = []) {
     return new StripeClient([
@@ -137,7 +136,7 @@ class StripeApiService {
   /**
    * Overrides API version.
    *
-   * @return string|NULL
+   * @return string|null
    *   Stripe API version or NULL.
    */
   public function getApiVersion() {
