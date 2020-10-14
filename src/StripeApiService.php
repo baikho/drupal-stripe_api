@@ -5,9 +5,10 @@ namespace Drupal\stripe_api;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Logger\LoggerChannelInterface
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\key\KeyRepositoryInterface;
 use Stripe\Stripe;
+use Stripe\StripeClient;
 
 /**
  * Class StripeApiService.
@@ -45,15 +46,37 @@ class StripeApiService {
   protected $key;
 
   /**
-   * Constructor.
+   * StripeApiService constructor.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   Config factory.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\Core\LoggerInterface $logger
+   *   Logger.
+   * @param \Drupal\key\KeyRepositoryInterface $key
+   *   The Key Repository.
    */
   public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger, KeyRepositoryInterface $key) {
     $this->config = $config_factory->get('stripe_api.settings');
     $this->entityTypeManager = $entity_type_manager;
     $this->logger = $logger;
     $this->key = $key;
-    Stripe::setApiKey($this->getApiKey());
-    $this->overrideApiVersion();
+  }
+
+  /**
+   * Get a Stripe Client.
+   *
+   * @param array $config
+   *   Optional array of config.
+   *
+   * @return \Stripe\StripeClient
+   */
+  public function getStripeClient(array $config = []) {
+    return new StripeClient([
+      'api_key' => $this->getApiKey(),
+      'stripe_version' => $this->getApiVersion(),
+    ] + $config);
   }
 
   /**
@@ -113,54 +136,12 @@ class StripeApiService {
 
   /**
    * Overrides API version.
-   */
-  public function overrideApiVersion() {
-    if ($this->config->get('api_version') === 'custom') {
-      Stripe::setApiVersion($this->config->get('api_version_custom'));
-    }
-  }
-
-  /**
-   * Makes a call to the Stripe API.
    *
-   * @param string $object
-   *   Stripe object. Can be a Charge, Refund, Customer, Subscription, Card,
-   *   Plan, Coupon, Discount, Invoice, InvoiceItem, Dispute, Transfer,
-   *   TransferReversal, Recipient, BankAccount, ApplicationFee, FeeRefund,
-   *   Account, Balance, Event, Token, BitcoinReceiver, FileUpload.
-   * @param string $method
-   *   Stripe object method. Common operations include retrieve, all, create.
-   * @param ...
-   *   Additional params to pass to the method. Can be an array, string.
-   *
-   * @return \Stripe\ApiResource|string|null
-   *   Returns the ApiResource or NULL on error or string which contains called
-   *   class if method not exist.
+   * @return string|NULL
+   *   Stripe API version or NULL.
    */
-  public function call($object, $method) {
-    $object = ucfirst($object);
-    $class = '\\Stripe\\' . $object;
-    $args = func_get_args();
-
-    // Remove $object and $method from the arguments.
-    unset($args[0], $args[1]);
-    if ($method) {
-      try {
-        return call_user_func_array([$class, $method], $args);
-      }
-      catch (\Throwable $e) {
-        $this->logger->error('Error: @error <br /> @args', [
-          '@args' => Json::encode([
-            'object' => $object,
-            'method' => $method,
-            'args' => $args,
-          ]),
-          '@error' => $e->getMessage(),
-        ]);
-        return NULL;
-      }
-    }
-    return $class;
+  public function getApiVersion() {
+    return $this->config->get('api_version') === 'custom' ? $this->config->get('api_version_custom') : NULL;
   }
 
 }
