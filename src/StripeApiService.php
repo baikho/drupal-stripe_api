@@ -2,11 +2,11 @@
 
 namespace Drupal\stripe_api;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Logger\LoggerChannelInterface
 use Drupal\key\KeyRepositoryInterface;
-use Psr\Log\LoggerInterface;
 use Stripe\Stripe;
 
 /**
@@ -17,11 +17,11 @@ use Stripe\Stripe;
 class StripeApiService {
 
   /**
-   * Drupal\Core\Config\ConfigFactory definition.
+   * The 'stripe_api.settings' config.
    *
-   * @var \Drupal\Core\Config\ConfigFactory
+   * @var \Drupal\Core\Config\Config
    */
-  protected $configFactory;
+  protected $config;
 
   /**
    * The entity type manager.
@@ -33,7 +33,7 @@ class StripeApiService {
   /**
    * Logger.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
    */
   protected $logger;
 
