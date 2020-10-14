@@ -187,7 +187,7 @@ class StripeApiAdminForm extends ConfigFormBase {
    */
   public function testStripeConnection(array &$form, FormStateInterface $form_state) {
     try {
-      $account = $this->stripeApi->call('account', 'retrieve');
+      $account = $this->stripeApi->getStripeClient()->accounts->retrieve();
     }
     catch (\Exception $e) {
       $account = NULL;
