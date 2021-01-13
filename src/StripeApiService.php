@@ -72,10 +72,10 @@ class StripeApiService {
    *   The StripeClient.
    */
   public function getStripeClient(array $config = []) {
-    return new StripeClient([
+    return new StripeClient(array_merge([
       'api_key' => $this->getApiKey(),
       'stripe_version' => $this->getApiVersion(),
-    ] + $config);
+    ], $config));
   }
 
   /**
